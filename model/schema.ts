@@ -23,6 +23,7 @@ const Book_schema = new Schema<user>({
     }
 })
 
+
 const BookModel = model<user>('BookModel',Book_schema);
 
 export default BookModel;
