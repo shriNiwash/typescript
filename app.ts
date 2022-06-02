@@ -13,12 +13,14 @@ import Local from 'passport-local';
 const LocalStrategy = Local.Strategy;
 import session from 'express-session';
 import { KeyObjectType } from 'crypto';
+import fetch  from 'node-fetch';
 
 
 
 //body parser middleware
 app.use(bodyParser.json());
 app.use(express.urlencoded({extended:false}));
+var urlencodedParser = bodyParser.urlencoded({extended: false});
 
 //initializing session
 app.use(session({
@@ -78,6 +80,22 @@ app.get('/list',isAuthenticate,async(req:Request,res:Response)=>{
     catch(err:any){
         console.log(err);
     }
+})
+//search option
+app.get('/search',isAuthenticate,(req:Request,res:Response):void=>{
+    res.render('search');
+})
+
+app.post('/search',urlencodedParser,async(req:Request,res:Response)=>{
+    var name = req.body.search;
+    console.log(name);
+    const api_url = `https://www.googleapis.com/books/v1/volumes?q=${name}&key=AIzaSyCBguij5N4XLeQ_RHE_pTGlLyTWfbVTcyU`;
+    const fetch_response = await fetch(api_url);
+    const json = await  fetch_response.json();
+    const datas = json.items;
+    console.log(datas);
+    res.render('search',{data:datas});
+    // console.log(json.items.volumeInfo.imageLinks.smallThumbnail);
 })
 
 app.post('/insert',upload.single('blogimage'),async(req:Request,res:Response)=>{
@@ -167,7 +185,8 @@ passport.deserializeUser((id,done)=>{
 
 //logout feature
 app.get('/logout',(req:Request,res:Response)=>{
-    req.logout();
+    //@ts-ignore 
+    req.logout(()=>{});
     res.redirect('/login');
 })
 
@@ -200,23 +219,46 @@ app.get('/register',(req:Request,res:Response)=>{
 })
 
 //user sign up
-app.post('/register',async(req:Request,res:Response)=>{
-    var username=req.body.username;
-    var password=req.body.password;
-    try{
-        const data = new UserModel({
-            name:`${username}`,
-            password:`${password}`
-        })
-        await data.save();
-        console.log('user signed up',data);
-        res.redirect('/login');
-    }
-    catch(err:any){
-        console.log(err);
-    }
+// app.post('/register',async(req:Request,res:Response)=>{
+//     var username=req.body.username;
+//     var password=req.body.password;
+//     try{
+//         const data = new UserModel({
+//             name:`${username}`,
+//             password:`${password}`
+//         })
+//         await data.save();
+//         console.log('user signed up',data);
+//         res.redirect('/login');
+//     }
+//     catch(err:any){
+//         console.log(err);
+//     }
 
-});
+// });
+
+app.post('/register',async(req:Request,res:Response,done)=>{
+        var username=req.body.username;
+        var password=req.body.password;
+        try{
+            await UserModel.findOne({name:username},(err:any,user:any)=>{
+                if(err) done(false);
+                else if(user) res.redirect('/login');
+                else{
+                    const data = new UserModel({
+                        name:username,
+                        password:password
+                    })
+                    data.save().then(()=>console.log('you are signed up')).catch((err:any)=>{console.log(err)});
+                    res.redirect('/login');
+                }
+            })
+
+        }
+        catch(err){
+            console.log(err);
+        }
+})
 
 
 //authenticate
