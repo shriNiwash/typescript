@@ -14,17 +14,31 @@
     <div class="container">
       <h1>Search for Book</h1>
       <form action="/search" method="post">
-        <input type="text" name="search" id="seach" class="form-control mt-5" /><br>
-        <input type="submit" value="submit" class="btn btn-primary" name="submit">
+        <input
+          type="text"
+          name="search"
+          id="seach"
+          class="form-control mt-5"
+        /><br />
+        <input
+          type="submit"
+          value="submit"
+          class="btn btn-primary"
+          name="submit"
+        />
       </form>
     </div>
-    <div class="container">
-        <h2>List of Books are here</h2>
+    <div class="d-flex align-content-start flex-wrap container" >
         {{#each data}}
-        <a href="{{volumeInfo.infoLink}}">
-            <img src="{{volumeInfo.imageLinks.smallThumbnail}}" alt="photos">
-        </a>
-        {{/each}}
+      <div class="card" style="width: 18rem;margin-left: 12px; margin-top:12px">
+        <img src="{{volumeInfo.imageLinks.smallThumbnail}}" class="card-img-top" alt="..." />
+        <div class="card-body">
+          <h6 class="card-title">{{volumeInfo.subtitle}}</h6>
+          <p class="card-text">{{volumeInfo.publisher}}</p>
+          <a href="{{volumeInfo.infoLink}}" class="btn btn-primary">Details</a>
+        </div>
+      </div>
+      {{/each}}
     </div>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"

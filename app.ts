@@ -93,9 +93,7 @@ app.post('/search',urlencodedParser,async(req:Request,res:Response)=>{
     const fetch_response = await fetch(api_url);
     const json = await  fetch_response.json();
     const datas = json.items;
-    console.log(datas);
     res.render('search',{data:datas});
-    // console.log(json.items.volumeInfo.imageLinks.smallThumbnail);
 })
 
 app.post('/insert',upload.single('blogimage'),async(req:Request,res:Response)=>{
